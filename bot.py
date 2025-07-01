@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     ApplicationBuilder,
@@ -10,13 +11,15 @@ from telegram.ext import (
     filters
 )
 from dotenv import load_dotenv
-import sys
 
-# .env faylidan bot tokenini yuklash
+# .env faylidan token olish
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
-# data.json faylidan do‘konlar ro‘yxatini yuklaymiz
+# Admin Telegram ID
+ADMIN_ID = 123456789  # Bu yerga o'z ID'ingizni yozing
+
+# Do'konlar ro'yxatini yuklash
 try:
     with open('data.json', 'r', encoding='utf-8') as f:
         data = json.load(f)
@@ -28,6 +31,20 @@ except json.JSONDecodeError:
     print("Xato: data.json fayli noto‘g‘ri formatda!")
     sys.exit(1)
 
+# Foydalanuvchini saqlovchi funksiya
+def save_user(user_id):
+    try:
+        with open("users.json", "r") as f:
+            users = json.load(f)
+    except (FileNotFoundError, json.decoder.JSONDecodeError):
+        users = []
+
+    if user_id not in users:
+        users.append(user_id)
+        with open("users.json", "w") as f:
+            json.dump(users, f)
+
+# /start komandasi
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not shops:
         await update.message.reply_text("❗ Hozirda do‘konlar mavjud emas. Keyinroq urinib ko‘ring.")
@@ -39,12 +56,13 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text("Kerakli do‘konni tanlang:", reply_markup=reply_markup)
 
+# Do'kon tanlash tugmasi uchun
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
     shop_id = query.data
     selected_shop = next((s for s in shops if s['id'] == shop_id), None)
-    
+
     if selected_shop:
         context.user_data['selected_shop'] = selected_shop
         msg = (
@@ -57,10 +75,18 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         await query.message.reply_text("❗ Do‘kon topilmadi. Iltimos, /start ni qayta bosing.")
 
+# Oddiy foydalanuvchi xabari (to'lov ma'lumoti)
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user
-    shop = context.user_data.get('selected_shop')
+    user_id = user.id
 
+    save_user(user_id)
+
+    # Admin bo‘lsa — bu funksiya ishlamasligi kerak
+    if user_id == ADMIN_ID:
+        return
+
+    shop = context.user_data.get('selected_shop')
     if not shop:
         await update.message.reply_text("❗ Iltimos, avval do‘konni tanlang /start")
         return
@@ -84,12 +110,41 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await context.bot.send_photo(chat_id=admin_id, photo=photo_file_id, caption=text)
         else:
             await context.bot.send_message(chat_id=admin_id, text=text)
-        
+
         await update.message.reply_text("✅ Ma'lumotlar yuborildi. Do‘kon admini tez orada siz bilan bog‘lanadi.")
     except Exception as e:
         await update.message.reply_text("❌ Xato yuz berdi. Iltimos, qaytadan urinib ko‘ring.")
         print(f"Xato admin ID {admin_id} ga xabar yuborishda: {e}")
 
+# Admin uchun xabar forward funksiyasi
+async def admin_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.message.from_user.id
+    if user_id != ADMIN_ID:
+        return
+
+    save_user(user_id)
+
+    try:
+        with open("users.json", "r") as f:
+            users = json.load(f)
+    except:
+        users = []
+
+    for uid in users:
+        if uid == ADMIN_ID:
+            continue
+        try:
+            await context.bot.copy_message(
+                chat_id=uid,
+                from_chat_id=update.message.chat_id,
+                message_id=update.message.message_id
+            )
+        except Exception as e:
+            print(f"❌ Yuborib bo‘lmadi: {uid} — {e}")
+
+    await update.message.reply_text("✅ Hamma foydalanuvchilarga yuborildi.")
+
+# Botni ishga tushirish
 def main():
     if not BOT_TOKEN:
         print("Xato: Bot tokeni topilmadi! .env faylida BOT_TOKEN ni sozlang.")
@@ -99,6 +154,7 @@ def main():
 
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(button_handler))
+    app.add_handler(MessageHandler(filters.ALL & filters.User(user_id=ADMIN_ID), admin_message))
     app.add_handler(MessageHandler(filters.PHOTO | filters.TEXT, handle_message))
 
     print("Bot ishga tushdi...")
