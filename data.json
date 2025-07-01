@@ -2,13 +2,13 @@
   "shops": [
     {
       "id": "1",
-      "name": "Toshkent Store",
+      "name": "Fargona Store",
       "card": "9860160620906729",
       "admin_id": "6529991724"
     },
     {
       "id": "2",
-      "name": "Samarqand Market",
+      "name": "Andijon Market",
       "card": "9860160620906729",
       "admin_id": "5014087971"
     }
