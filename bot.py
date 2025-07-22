@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 
 # .env faylidan token olish
 load_dotenv()
-BOT_TOKEN = os.getenv("7990586343:AAGH9ssXjVZV0A-dwe9pyFSKRghVJG0-EOk")
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 # Admin Telegram ID
 ADMIN_ID = 6529991724  # Bu yerga o'z ID'ingizni yozing
