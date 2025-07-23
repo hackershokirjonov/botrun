@@ -68,6 +68,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         msg = (
             f"🏪 Do‘kon: {selected_shop['name']}\n"
             f"💳 To‘lov karta raqami: {selected_shop['card']}\n\n"
+            f"👤Ism Familiya: {selected_shop['surname']}\n\n"
             "Iltimos, to‘lovni amalga oshiring va quyidagi ma'lumotlarni yuboring:\n"
             "- 📸 To‘lov screenshot\n- 👤 Ism Familiya\n- 🧾 Buyurtma raqami\n- 🙋‍♀🙋‍♂ Savollar yoki Fikrlaringizni qoldiring"
         )
@@ -111,7 +112,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             await context.bot.send_message(chat_id=admin_id, text=text)
 
-        await update.message.reply_text("✅ Ma'lumotlar yuborildi. Do‘kon admini tez orada siz bilan bog‘lanadi.")
+        await update.message.reply_text("✅ To'lovingiz qabul qilindi.")
     except Exception as e:
         await update.message.reply_text("❌ Xato yuz berdi. Iltimos, qaytadan urinib ko‘ring.")
         print(f"Xato admin ID {admin_id} ga xabar yuborishda: {e}")
