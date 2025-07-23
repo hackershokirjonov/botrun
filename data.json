@@ -2,15 +2,17 @@
   "shops": [
     {
       "id": "1",
-      "name": "Tima Shop",
-      "card": "9860160620906729",
-      "admin_id": "6529991724"
+      "name": "XL Kross",
+      "card": "5614682902550815",
+      "surname": "Лапасов Искандарбек",
+      "admin_id": "6649796097"
     },
     {
       "id": "2",
       "name": "Andijon Market",
-      "card": "9860160620906729",
-      "admin_id": "5014087971"
+      "card": "9860 1606 2090 6729",
+      "surname":"Shokirjonov Muhammad Sodiq",
+      "admin_id": "6529991724"
     }
   ]
 }
