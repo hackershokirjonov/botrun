@@ -17,7 +17,7 @@ load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 # Admin Telegram ID
-ADMIN_ID = 6529991724  # Bu yerga o'z ID'ingizni yozing
+ADMIN_ID = 6649796097  # Bu yerga o'z ID'ingizni yozing
 
 # Do'konlar ro'yxatini yuklash
 try:
