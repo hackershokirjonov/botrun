@@ -70,7 +70,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"💳 To‘lov karta raqami: {selected_shop['card']}\n\n"
             f"👤Ism Familiya: {selected_shop['surname']}\n\n"
             "Iltimos, to‘lovni amalga oshiring va quyidagi ma'lumotlarni yuboring:\n"
-            "- 📸 To‘lov screenshot\n- 👤 Ism Familiya\n- 🧾 Buyurtma raqami\n- 🙋‍♀🙋‍♂ Savollar yoki Fikrlaringizni qoldiring"
+            "- 📸 To‘lov screenshot\n- 👤 Ism Familiya va username \n- 🧾 Buyurtma raqami\n- 🙋‍♀🙋‍♂ Savollar yoki Fikrlaringizni qoldiring"
         )
         await query.message.reply_text(msg)
     else:
